@@ -7,7 +7,9 @@ data LispVal = Atom String
         | List [LispVal]
         | DottedList [LispVal] LispVal
         | Number Integer
+        | Float Float    -- TODO(6): Float
         | String String
+        | Character Char -- TODO(5): Charactor
         | Bool Bool
         deriving Show
 
@@ -20,6 +22,8 @@ spaces = skipMany1 space
 parseString :: Parser LispVal
 parseString = do
     char '"'
+    -- TODO(2): \"が文字列を終わりにせず、二重引用符のリテラル表現となるように
+    -- TODO(3): \n, \r, \t, \\などのエスケープ文字も認識するように
     x <- many (noneOf "\"")
     char '"'
     return $ String x
@@ -34,18 +38,10 @@ parseAtom = do
         "#f" -> Bool False
         _    -> Atom atom
 
+-- TODO(4) Scheme standard for different basesもサポートするように
+-- TODO(7) Schemeの数値型のfull numeric towerを実装するデータ型とパーサを書く
 parseNumber :: Parser LispVal
 parseNumber = (Number . read) <$> many1 digit
-{-  -- using >>= sequence
-    many1 digit >>= return . Number . read 
--}
-{-  -- using liftM
-    --liftM (Number . read) $ many1 digit
--}
-{-  -- using do stmt
-    val <- many1 digit
-    return $ Number (read val)
--}
 
 parseExpr :: Parser LispVal
 parseExpr = parseAtom <|> parseString <|> parseNumber
