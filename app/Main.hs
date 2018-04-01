@@ -1,6 +1,14 @@
 module Main where
 
-import Lib
+import System.Environment
+import Control.Monad
+import Reader
+
+expr :: Int -> Int -> Int
+expr a b = a * b
 
 main :: IO ()
-main = someFunc
+main = do
+    (a:_) <- getArgs
+    putStrLn $ readExpr a
+
