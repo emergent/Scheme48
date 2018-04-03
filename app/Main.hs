@@ -10,5 +10,6 @@ expr a b = a * b
 main :: IO ()
 main = do
     (a:_) <- getArgs
+    putStrLn $ "input string: " ++ a
     putStrLn $ readExpr a
 
