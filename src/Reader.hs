@@ -7,7 +7,7 @@ data LispVal = Atom String
         | List [LispVal]
         | DottedList [LispVal] LispVal
         | Number Integer
-        | Float Float    -- TODO(6): Float
+        | Float Double    -- TODO(6): Float
         | String String
         | Character Char -- TODO(5): Charactor
         | Bool Bool
@@ -31,10 +31,7 @@ escapeChars = do
 parseString :: Parser LispVal
 parseString = do
     char '"'
-    -- TODO(2): \"が文字列を終わりにせず、二重引用符のリテラル表現となるように
-    -- TODO(3): \n, \r, \t, \\などのエスケープ文字も認識するように
     x <- many (escapeChars <|> noneOf "\"\\")
-    -- x <- many (noneOf "\"")
     char '"'
     return $ String x
 
@@ -51,7 +48,7 @@ parseAtom = do
 -- TODO(4) Scheme standard for different basesもサポートするように
 -- TODO(7) Schemeの数値型のfull numeric towerを実装するデータ型とパーサを書く
 parseNumber :: Parser LispVal
-parseNumber = (Number . read) <$> many1 digit
+parseNumber = Number . read <$> many1 digit
 
 parseExpr :: Parser LispVal
 parseExpr = parseAtom <|> parseString <|> parseNumber
