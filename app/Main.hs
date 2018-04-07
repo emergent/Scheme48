@@ -3,13 +3,12 @@ module Main where
 import System.Environment
 import Control.Monad
 import Reader
-
-expr :: Int -> Int -> Int
-expr a b = a * b
+import Eval
 
 main :: IO ()
-main = do
+main = do -- getArgs >>= print . eval . readExpr . head
     (a:_) <- getArgs
     putStrLn $ "input string: " ++ a
-    putStrLn $ readExpr a
+    (print . eval . readExpr) a
+    --putStrLn $ readExpr a
 
