@@ -2,30 +2,9 @@ module Reader where
 
 import Text.ParserCombinators.Parsec hiding (spaces)
 import Control.Monad
-
-data LispVal = Atom String
-        | List [LispVal]
-        | DottedList [LispVal] LispVal
-        | Number Integer
-        | Float Double    -- TODO(6): Float
-        | String String
-        | Character Char -- TODO(5): Charactor
-        | Bool Bool
---        deriving Show
-
-instance Show LispVal where show = showVal
-
-showVal :: LispVal -> String
-showVal (String contents) = "\"" ++ contents ++ "\""
-showVal (Atom name) = name
-showVal (Number contents) = show contents
-showVal (Bool True) = "#t"
-showVal (Bool False) = "#f"
-showVal (List contents) = "(" ++ unwordsList contents ++ ")"
-showVal (DottedList head tail) = "(" ++ unwordsList head ++ " . " ++ showVal tail ++ ")"
-
-unwordsList :: [LispVal] -> String
-unwordsList = unwords . map showVal
+import Control.Monad.Error
+import Value
+import Error
 
 symbol :: Parser Char
 symbol = oneOf "!#$%&|*+-/:<=>?@^_~"
@@ -90,8 +69,7 @@ parseExpr = parseAtom
             char ')'
             return x
 
-readExpr :: String -> LispVal
+readExpr :: String -> ThrowsError LispVal
 readExpr input = case parse parseExpr "lisp" input of
-    Left err -> String $ "No match: " ++ show err
-    Right val -> val
-    --Right val -> "Found value: " ++ show val
+    Left err -> throwError $ Parser err
+    Right val -> return val
