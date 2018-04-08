@@ -1,10 +1,10 @@
 module EvalSpec (spec) where
 
-import Test.Hspec
-import Eval
-import Reader
-import Error
-import Control.Monad
+import           Control.Monad
+import           Error
+import           Eval
+import           Reader
+import           Test.Hspec
 
 subfn :: String -> String
 subfn str = do

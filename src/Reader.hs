@@ -1,10 +1,10 @@
 module Reader where
 
-import Text.ParserCombinators.Parsec hiding (spaces)
-import Control.Monad
-import Control.Monad.Error
-import Value
-import Error
+import           Control.Monad
+import           Control.Monad.Error
+import           Error
+import           Text.ParserCombinators.Parsec hiding (spaces)
+import           Value
 
 symbol :: Parser Char
 symbol = oneOf "!#$%&|*+-/:<=>?@^_~"
@@ -71,5 +71,5 @@ parseExpr = parseAtom
 
 readExpr :: String -> ThrowsError LispVal
 readExpr input = case parse parseExpr "lisp" input of
-    Left err -> throwError $ Parser err
+    Left err  -> throwError $ Parser err
     Right val -> return val

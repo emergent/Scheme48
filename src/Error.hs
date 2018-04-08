@@ -1,13 +1,13 @@
 module Error where
 
-import Control.Monad.Error
-import Text.ParserCombinators.Parsec hiding (spaces)
-import Value
+import           Control.Monad.Error
+import           Text.ParserCombinators.Parsec hiding (spaces)
+import           Value
 
 data LispError = NumArgs Integer [LispVal]
         | TypeMismatch String LispVal
         | Parser ParseError
-        | BadSpecialForm String LispVal 
+        | BadSpecialForm String LispVal
         | NotFunction String String
         | UnboundVar String String
         | Default String
