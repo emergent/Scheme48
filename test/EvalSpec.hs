@@ -28,3 +28,27 @@ spec = do
             subfn "(+ 2)" `shouldBe` "Expected 2 args; found values 2"
         it "error 003" $
             subfn "(what? 2)" `shouldBe` "Unrecognized primitive function args: \"what?\""
+    describe "boolbinop" $ do
+        it "boolbinop num 001" $
+            subfn "(< 3 4)" `shouldBe` "#t"
+        it "boolbinop num 002" $
+            subfn "(< 4 3)" `shouldBe` "#f"
+        it "boolbinop num 003" $
+            subfn "(<= 3 3)" `shouldBe` "#t"
+        it "boolbinop str 001" $
+            subfn "(string=? \"test\" \"test\")" `shouldBe` "#t"
+        it "boolbinop str 002" $
+            subfn "(string=? \"test\" \"tesu\")" `shouldBe` "#f"
+        it "boolbinop str 003" $
+            subfn "(string>? \"testt\" \"test\")" `shouldBe` "#t"
+        it "boolbinop str 004" $
+            subfn "(string<? \"testt\" \"test\")" `shouldBe` "#f"
+        it "boolbinop str 005" $
+            subfn "(string<=? \"test\" \"test\")" `shouldBe` "#t"
+        it "boolbinop bool 001" $ do
+            subfn "(&& #t #t)" `shouldBe` "#t"
+            subfn "(&& #f #t)" `shouldBe` "#f"
+            subfn "(|| #t #t)" `shouldBe` "#t"
+            subfn "(|| #f #t)" `shouldBe` "#t"
+            subfn "(|| #f #f)" `shouldBe` "#f"
+
