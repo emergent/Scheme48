@@ -1,5 +1,6 @@
 module Error where
 
+-- TODO: use Except instead of Error
 import           Control.Monad.Error
 import           Text.ParserCombinators.Parsec hiding (spaces)
 import           Value

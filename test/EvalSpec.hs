@@ -8,7 +8,7 @@ import           Test.Hspec
 
 subfn :: String -> String
 subfn str = do
-    evaled <- return $ liftM show $ readExpr str >>= eval
+    let evaled = fmap show $ readExpr str >>= eval
     extractValue $ trapError evaled
 
 spec :: Spec
@@ -50,7 +50,7 @@ spec = do
             subfn "(|| #t #t)" `shouldBe` "#t"
             subfn "(|| #f #t)" `shouldBe` "#t"
             subfn "(|| #f #f)" `shouldBe` "#f"
-    describe "if" $ do
+    describe "if" $
         it "if 001" $ do
             subfn "(if (> 2 3) \"yes\" \"no\")" `shouldBe` "\"no\""
             subfn "(if (< 2 3) \"yes\" \"no\")" `shouldBe` "\"yes\""

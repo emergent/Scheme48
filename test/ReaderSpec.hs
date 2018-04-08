@@ -1,8 +1,8 @@
 module ReaderSpec (spec) where
 
-import Test.Hspec
-import Reader
+import           Reader
+import           Test.Hspec
 
 spec :: Spec
-spec = do
+spec =
     return ()

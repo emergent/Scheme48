@@ -45,7 +45,7 @@ parseNumber = Number . read <$> many1 digit
 
 
 parseList :: Parser LispVal
-parseList = liftM List $ sepBy parseExpr spaces
+parseList = fmap List $ sepBy parseExpr spaces
 
 parseDottedList :: Parser LispVal
 parseDottedList = do
