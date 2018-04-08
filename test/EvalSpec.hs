@@ -9,8 +9,7 @@ import Control.Monad
 subfn :: String -> String
 subfn str = do
     evaled <- return $ liftM show $ readExpr str >>= eval
-    r <- extractValue $ trapError evaled
-    return r
+    extractValue $ trapError evaled
 
 spec :: Spec
 spec = do
@@ -51,4 +50,32 @@ spec = do
             subfn "(|| #t #t)" `shouldBe` "#t"
             subfn "(|| #f #t)" `shouldBe` "#t"
             subfn "(|| #f #f)" `shouldBe` "#f"
+    describe "if" $ do
+        it "if 001" $ do
+            subfn "(if (> 2 3) \"yes\" \"no\")" `shouldBe` "\"no\""
+            subfn "(if (< 2 3) \"yes\" \"no\")" `shouldBe` "\"yes\""
+            subfn "(if (= 3 3) (+ 2 3 (- 5 1)) \"unequal\")" `shouldBe` "9"
+    describe "list op" $ do
+        it "car 001" $ do
+            subfn "(car '(a b c))" `shouldBe` "a"
+            subfn "(car '(a))" `shouldBe` "a"
+            subfn "(car '(a b . c))" `shouldBe` "a"
+            subfn "(car 'a)" `shouldNotBe` "()"
+            subfn "(car 'a 'b)" `shouldNotBe` "()"
+        it "cdr 001" $ do
+            subfn "(cdr '(a b c))" `shouldBe` "(b c)"
+            subfn "(cdr '(a))" `shouldBe` "()"
+            subfn "(cdr '(a b . c))" `shouldBe` "(b . c)"
+            subfn "(cdr 'a)" `shouldNotBe` "()"
+            subfn "(cdr 'a 'b)" `shouldNotBe` "()"
+        it "cons 001" $ do
+            subfn "(cons 'a '())" `shouldBe` "(a)"
+            --subfn "(cons 'a ())" `shouldBe` "(a)"
+            subfn "(cons 'a 'b)" `shouldBe` "(a . b)"
+            subfn "(cons 'a '(b))" `shouldBe` "(a b)"
+            subfn "(cons '(a) 'b)" `shouldBe` "((a) . b)"
+            subfn "(cons 'a '(b c))"  `shouldBe` "(a b c)"
+            subfn "(cons 'a '(b . c))"  `shouldBe` "(a b . c)"
+            subfn "(cons '(a) '(b . c))"  `shouldBe` "((a) b . c)"
+
 
