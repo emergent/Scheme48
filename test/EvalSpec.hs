@@ -6,76 +6,77 @@ import           Eval
 import           Reader
 import           Test.Hspec
 
-subfn :: String -> String
-subfn str = do
-    let evaled = fmap show $ readExpr str >>= eval
-    extractValue $ trapError evaled
+subfn :: String -> IO String
+subfn str = nullEnv >>= flip evalString str
+
+evalString :: Env -> String -> IO String
+evalString env expr = runIOThrows $ liftM show $ (liftThrows $ readExpr expr) >>= eval env
 
 spec :: Spec
 spec = do
     describe "eval" $ do
         it "calc 001" $
-            subfn "(+ 1 2)" `shouldBe` "3"
+            subfn "(+ 1 2)" `shouldReturn` "3"
         it "calc 002" $
-            subfn "(+ 1 (- 3 2))" `shouldBe` "2"
+            subfn "(+ 1 (- 3 2))" `shouldReturn` "2"
         it "calc 003" $
-            subfn "(- (+ 4 6 3) 3 5 2)" `shouldBe` "3"
+            subfn "(- (+ 4 6 3) 3 5 2)" `shouldReturn` "3"
     describe "error" $ do
         it "error 001" $
-            subfn "(+ 2 \"two\")" `shouldBe` "Invalid type: expected number, found \"two\""
+            subfn "(+ 2 \"two\")" `shouldReturn` "Invalid type: expected number, found \"two\""
         it "error 002" $
-            subfn "(+ 2)" `shouldBe` "Expected 2 args; found values 2"
+            subfn "(+ 2)" `shouldReturn` "Expected 2 args; found values 2"
         it "error 003" $
-            subfn "(what? 2)" `shouldBe` "Unrecognized primitive function args: \"what?\""
+            subfn "(what? 2)" `shouldReturn` "Unrecognized primitive function args: \"what?\""
     describe "boolbinop" $ do
         it "boolbinop num 001" $
-            subfn "(< 3 4)" `shouldBe` "#t"
+            subfn "(< 3 4)" `shouldReturn` "#t"
         it "boolbinop num 002" $
-            subfn "(< 4 3)" `shouldBe` "#f"
+            subfn "(< 4 3)" `shouldReturn` "#f"
         it "boolbinop num 003" $
-            subfn "(<= 3 3)" `shouldBe` "#t"
+            subfn "(<= 3 3)" `shouldReturn` "#t"
         it "boolbinop str 001" $
-            subfn "(string=? \"test\" \"test\")" `shouldBe` "#t"
+            subfn "(string=? \"test\" \"test\")" `shouldReturn` "#t"
         it "boolbinop str 002" $
-            subfn "(string=? \"test\" \"tesu\")" `shouldBe` "#f"
+            subfn "(string=? \"test\" \"tesu\")" `shouldReturn` "#f"
         it "boolbinop str 003" $
-            subfn "(string>? \"testt\" \"test\")" `shouldBe` "#t"
+            subfn "(string>? \"testt\" \"test\")" `shouldReturn` "#t"
         it "boolbinop str 004" $
-            subfn "(string<? \"testt\" \"test\")" `shouldBe` "#f"
+            subfn "(string<? \"testt\" \"test\")" `shouldReturn` "#f"
         it "boolbinop str 005" $
-            subfn "(string<=? \"test\" \"test\")" `shouldBe` "#t"
+            subfn "(string<=? \"test\" \"test\")" `shouldReturn` "#t"
         it "boolbinop bool 001" $ do
-            subfn "(&& #t #t)" `shouldBe` "#t"
-            subfn "(&& #f #t)" `shouldBe` "#f"
-            subfn "(|| #t #t)" `shouldBe` "#t"
-            subfn "(|| #f #t)" `shouldBe` "#t"
-            subfn "(|| #f #f)" `shouldBe` "#f"
+            subfn "(&& #t #t)" `shouldReturn` "#t"
+            subfn "(&& #f #t)" `shouldReturn` "#f"
+            subfn "(|| #t #t)" `shouldReturn` "#t"
+            subfn "(|| #f #t)" `shouldReturn` "#t"
+            subfn "(|| #f #f)" `shouldReturn` "#f"
     describe "if" $
         it "if 001" $ do
-            subfn "(if (> 2 3) \"yes\" \"no\")" `shouldBe` "\"no\""
-            subfn "(if (< 2 3) \"yes\" \"no\")" `shouldBe` "\"yes\""
-            subfn "(if (= 3 3) (+ 2 3 (- 5 1)) \"unequal\")" `shouldBe` "9"
+            subfn "(if (> 2 3) \"yes\" \"no\")" `shouldReturn` "\"no\""
+            subfn "(if (< 2 3) \"yes\" \"no\")" `shouldReturn` "\"yes\""
+            subfn "(if (= 3 3) (+ 2 3 (- 5 1)) \"unequal\")" `shouldReturn` "9"
     describe "list op" $ do
         it "car 001" $ do
-            subfn "(car '(a b c))" `shouldBe` "a"
-            subfn "(car '(a))" `shouldBe` "a"
-            subfn "(car '(a b . c))" `shouldBe` "a"
-            subfn "(car 'a)" `shouldNotBe` "()"
-            subfn "(car 'a 'b)" `shouldNotBe` "()"
+            subfn "(car '(a b c))" `shouldReturn` "a"
+            subfn "(car '(a))" `shouldReturn` "a"
+            subfn "(car '(a b . c))" `shouldReturn` "a"
+            subfn "(car 'a)" `shouldNotReturn` "()"
+            subfn "(car 'a 'b)" `shouldNotReturn` "()"
         it "cdr 001" $ do
-            subfn "(cdr '(a b c))" `shouldBe` "(b c)"
-            subfn "(cdr '(a))" `shouldBe` "()"
-            subfn "(cdr '(a b . c))" `shouldBe` "(b . c)"
-            subfn "(cdr 'a)" `shouldNotBe` "()"
-            subfn "(cdr 'a 'b)" `shouldNotBe` "()"
+            subfn "(cdr '(a b c))" `shouldReturn` "(b c)"
+            subfn "(cdr '(a))" `shouldReturn` "()"
+            subfn "(cdr '(a b . c))" `shouldReturn` "(b . c)"
+            subfn "(cdr 'a)" `shouldNotReturn` "()"
+            subfn "(cdr 'a 'b)" `shouldNotReturn` "()"
         it "cons 001" $ do
-            subfn "(cons 'a '())" `shouldBe` "(a)"
-            --subfn "(cons 'a ())" `shouldBe` "(a)"
-            subfn "(cons 'a 'b)" `shouldBe` "(a . b)"
-            subfn "(cons 'a '(b))" `shouldBe` "(a b)"
-            subfn "(cons '(a) 'b)" `shouldBe` "((a) . b)"
-            subfn "(cons 'a '(b c))"  `shouldBe` "(a b c)"
-            subfn "(cons 'a '(b . c))"  `shouldBe` "(a b . c)"
-            subfn "(cons '(a) '(b . c))"  `shouldBe` "((a) b . c)"
+            subfn "(cons 'a '())" `shouldReturn` "(a)"
+            --subfn "(cons 'a ())" `shouldReturn` "(a)"
+            subfn "(cons 'a 'b)" `shouldReturn` "(a . b)"
+            subfn "(cons 'a '(b))" `shouldReturn` "(a b)"
+            subfn "(cons '(a) 'b)" `shouldReturn` "((a) . b)"
+            subfn "(cons 'a '(b c))"  `shouldReturn` "(a b c)"
+            subfn "(cons 'a '(b . c))"  `shouldReturn` "(a b . c)"
+            subfn "(cons '(a) '(b . c))"  `shouldReturn` "((a) b . c)"
 
 
