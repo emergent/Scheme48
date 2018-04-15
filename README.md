@@ -11,8 +11,8 @@ Practice implementation of [Write Yourself a Scheme in 48 Hours](https://en.wiki
 - [x] 3. Evaluation, Part 1
 - [x] 4. Error Checking and Exceptions
 - [x] 5. Evaluation, Part 2
-- [ ] 6. Building a REPL: Basic I/O
-- [ ] 7. Adding Variables and Assignment: Mutable State in Haskell
+- [x] 6. Building a REPL: Basic I/O
+- [x] 7. Adding Variables and Assignment: Mutable State in Haskell
 - [ ] 8. Defining Scheme Functions: Closures and Environments
 - [ ] 9. Creating IO Primitives: File I/O
 - [ ] 10. Towards a Standard Library: Fold and Unfold
