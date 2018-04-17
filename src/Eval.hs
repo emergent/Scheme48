@@ -4,8 +4,7 @@ module Eval (eval, Env, nullEnv) where
 
 import           Control.Monad.Error
 import           Data.IORef
-import           Error
-import           Value
+import           Types
 
 eval :: Env -> LispVal -> IOThrowsError LispVal
 eval env val@(String _) = return val
@@ -150,10 +149,6 @@ equal [arg1, arg2] = do
     return $ Bool $ (primitiveEquals || let (Bool x) = eqvEquals in x)
 equal badArgList = throwError $ NumArgs 2 badArgList
 
-
-type Env = IORef [(String, IORef LispVal)]
-nullEnv :: IO Env
-nullEnv = newIORef []
 
 isBound :: Env -> String -> IO Bool
 isBound envRef var = readIORef envRef >>= return . maybe False (const True) . lookup var

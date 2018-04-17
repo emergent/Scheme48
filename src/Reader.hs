@@ -2,9 +2,8 @@ module Reader where
 
 import           Control.Monad
 import           Control.Monad.Error
-import           Error
 import           Text.ParserCombinators.Parsec hiding (spaces)
-import           Value
+import           Types
 
 symbol :: Parser Char
 symbol = oneOf "!#$%&|*+-/:<=>?@^_~"

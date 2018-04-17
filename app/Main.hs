@@ -1,11 +1,11 @@
 module Main where
 
 import           Control.Monad
-import           Error
 import           Eval
 import           Reader
 import           System.Environment
 import           System.IO
+import           Types
 
 flushStr :: String -> IO ()
 flushStr str = putStr str >> hFlush stdout

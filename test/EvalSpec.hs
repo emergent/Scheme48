@@ -1,10 +1,10 @@
 module EvalSpec (spec) where
 
 import           Control.Monad
-import           Error
 import           Eval
 import           Reader
 import           Test.Hspec
+import           Types
 
 subfn :: String -> IO String
 subfn str = nullEnv >>= flip evalString str
@@ -78,5 +78,3 @@ spec = do
             subfn "(cons 'a '(b c))"  `shouldReturn` "(a b c)"
             subfn "(cons 'a '(b . c))"  `shouldReturn` "(a b . c)"
             subfn "(cons '(a) '(b . c))"  `shouldReturn` "((a) b . c)"
-
-

@@ -1,9 +1,36 @@
-module Error where
+module Types where
 
 -- TODO: use Except instead of Error
 import           Control.Monad.Error
+import           Data.IORef
 import           Text.ParserCombinators.Parsec hiding (spaces)
-import           Value
+
+data LispVal = Atom String
+    | List [LispVal]
+    | DottedList [LispVal] LispVal
+    | Number Integer
+    | Float Double    -- TODO(6): Float
+    | String String
+    | Character Char -- TODO(5): Charactor
+    | Bool Bool
+    | PrimitiveFunc ([LispVal] -> ThrowsError LispVal)
+    | Func {params :: [String], vararg :: (Maybe String), body :: [LispVal], closure :: Env}
+    -- deriving Show
+
+instance Show LispVal where show = showVal
+
+showVal :: LispVal -> String
+showVal (String contents) = "\"" ++ contents ++ "\""
+showVal (Atom name) = name
+showVal (Number contents) = show contents
+showVal (Bool True) = "#t"
+showVal (Bool False) = "#f"
+showVal (List contents) = "(" ++ unwordsList contents ++ ")"
+showVal (DottedList head tail) = "(" ++ unwordsList head ++ " . " ++ showVal tail ++ ")"
+
+unwordsList :: [LispVal] -> String
+unwordsList = unwords . map showVal
+
 
 data LispError = NumArgs Integer [LispVal]
         | TypeMismatch String LispVal
@@ -46,3 +73,7 @@ liftThrows (Right val) = return val
 runIOThrows :: IOThrowsError String -> IO String
 runIOThrows action = runErrorT (trapError action) >>= return . extractValue
 
+
+type Env = IORef [(String, IORef LispVal)]
+nullEnv :: IO Env
+nullEnv = newIORef []
