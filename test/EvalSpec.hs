@@ -7,7 +7,7 @@ import           Test.Hspec
 import           Types
 
 subfn :: String -> IO String
-subfn str = nullEnv >>= flip evalString str
+subfn str = primitiveBindings >>= flip evalString str
 
 evalString :: Env -> String -> IO String
 evalString env expr = runIOThrows $ liftM show $ (liftThrows $ readExpr expr) >>= eval env
@@ -27,7 +27,7 @@ spec = do
         it "error 002" $
             subfn "(+ 2)" `shouldReturn` "Expected 2 args; found values 2"
         it "error 003" $
-            subfn "(what? 2)" `shouldReturn` "Unrecognized primitive function args: \"what?\""
+            subfn "(what? 2)" `shouldReturn` "Getting an unbound variable: : what?"
     describe "boolbinop" $ do
         it "boolbinop num 001" $
             subfn "(< 3 4)" `shouldReturn` "#t"
@@ -78,3 +78,7 @@ spec = do
             subfn "(cons 'a '(b c))"  `shouldReturn` "(a b c)"
             subfn "(cons 'a '(b . c))"  `shouldReturn` "(a b . c)"
             subfn "(cons '(a) '(b . c))"  `shouldReturn` "((a) b . c)"
+        it "define vars" $ do -- test for define variables
+            subfn "(define x 3)" `shouldReturn` "3"
+            subfn "(+ x 3)" `shouldReturn` "6"
+

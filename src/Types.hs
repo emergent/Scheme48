@@ -27,10 +27,15 @@ showVal (Bool True) = "#t"
 showVal (Bool False) = "#f"
 showVal (List contents) = "(" ++ unwordsList contents ++ ")"
 showVal (DottedList head tail) = "(" ++ unwordsList head ++ " . " ++ showVal tail ++ ")"
+showVal (PrimitiveFunc _) = "<primitive>"
+showVal (Func {params = args, vararg = varargs, body = body, closure = env}) =
+        "(lambda (" ++ unwords (map show args) ++
+                (case varargs of
+                        Nothing  -> ""
+                        Just arg -> " . " ++ arg) ++ ") ...)"
 
 unwordsList :: [LispVal] -> String
 unwordsList = unwords . map showVal
-
 
 data LispError = NumArgs Integer [LispVal]
         | TypeMismatch String LispVal
