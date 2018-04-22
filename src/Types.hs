@@ -3,6 +3,7 @@ module Types where
 -- TODO: use Except instead of Error
 import           Control.Monad.Error
 import           Data.IORef
+import           System.IO
 import           Text.ParserCombinators.Parsec hiding (spaces)
 
 data LispVal = Atom String
@@ -15,7 +16,8 @@ data LispVal = Atom String
     | Bool Bool
     | PrimitiveFunc ([LispVal] -> ThrowsError LispVal)
     | Func {params :: [String], vararg :: (Maybe String), body :: [LispVal], closure :: Env}
-    -- deriving Show
+    | IOFunc ([LispVal] -> IOThrowsError LispVal)
+    | Port Handle
 
 instance Show LispVal where show = showVal
 
@@ -33,6 +35,8 @@ showVal (Func {params = args, vararg = varargs, body = body, closure = env}) =
                 (case varargs of
                         Nothing  -> ""
                         Just arg -> " . " ++ arg) ++ ") ...)"
+showVal (Port _) = "<IO port>"
+showVal (IOFunc _) = "<IO primitive>"
 
 unwordsList :: [LispVal] -> String
 unwordsList = unwords . map showVal
