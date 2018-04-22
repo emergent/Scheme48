@@ -226,7 +226,7 @@ defineVar envRef var value = do
 bindVars :: Env -> [(String, LispVal)] -> IO Env
 bindVars envRef bindings = readIORef envRef >>= extendEnv bindings >>= newIORef
             where
-                extendEnv bindings env = liftM (++ env) (mapM addBinding bindings)
+                extendEnv bindings env = fmap (++ env) (mapM addBinding bindings)
                 addBinding (var, value) = do
                     ref <- newIORef value
                     return (var, ref)
@@ -240,7 +240,7 @@ applyProc [func, List args] = apply func args
 applyProc (func : args)     = apply func args
 
 makePort :: IOMode -> [LispVal] -> IOThrowsError LispVal
-makePort mode [String filename] = liftM Port $ liftIO $ openFile filename mode
+makePort mode [String filename] = fmap Port $ liftIO $ openFile filename mode
 
 closePort :: [LispVal] -> IOThrowsError LispVal
 closePort [Port port] = liftIO $ hClose port >> (return $ Bool True)
@@ -255,12 +255,12 @@ writeProc [obj]            = writeProc [obj, Port stdout]
 writeProc [obj, Port port] = liftIO $ hPrint port obj >> (return $ Bool True)
 
 readContents :: [LispVal] -> IOThrowsError LispVal
-readContents [String filename] = liftM String $ liftIO $ readFile filename
+readContents [String filename] = fmap String $ liftIO $ readFile filename
 
 load :: String -> IOThrowsError [LispVal]
 load filename = (liftIO $ readFile filename) >>= liftThrows . readExprList
 
 readAll :: [LispVal] -> IOThrowsError LispVal
-readAll [String filename] = liftM List $ load filename
+readAll [String filename] = fmap List $ load filename
 
 
